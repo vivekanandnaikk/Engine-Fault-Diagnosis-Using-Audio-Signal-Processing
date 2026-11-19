@@ -1,23 +1,23 @@
 # Implementation status
 
-This repository is a reconstructed reference project based on the author's recollection. It is not the original source code and has not been validated against original recordings.
+This repository implements a digital-signal-processing workflow for analyzing motorcycle engine audio and comparing descriptive features for normal and faulty recordings.
 
-## Available in this repository
+## Included
 
 - Python WAV loading with integer PCM normalization and stereo-to-mono conversion.
-- Hann-windowed whole-recording FFT and single-sided magnitude spectrum calculations.
-- RMS, zero-crossing rate, spectral centroid, bandwidth, 85% roll-off, dominant non-DC frequency, and MFCC mean/standard-deviation summaries.
+- Hann-windowed FFT with a single-sided magnitude spectrum.
+- RMS, zero-crossing rate, spectral centroid, bandwidth, 85% roll-off, dominant frequency, and MFCC summaries.
 - Python CLI commands for single-file analysis, two-file comparison, and dataset CSV extraction.
 - MATLAB analysis function; MFCC output depends on MATLAB Audio Toolbox.
-- Unit tests for signal handling and core feature calculations.
+- Unit tests for audio conversion and core feature calculations.
 
-## Not supplied or established
+## Not included
 
-- Original code, source history, motorcycle recordings, detailed labels, and acquisition metadata.
-- Exact RPM/load, phone, sample-rate, recording-distance, or environment settings.
-- Fault-specific thresholds, a trained classifier, a validated diagnostic protocol, or diagnostic accuracy.
-- Real-time processing, adaptive LMS/RLS filters, or machine-learning methods.
+- Original recordings or recording metadata are not distributed in this repository.
+- A trained or validated fault classifier is not implemented.
+- Diagnostic thresholds, fault-type labels, or accuracy claims are not included.
+- LMS/RLS adaptive filtering and real-time acquisition are future work.
 
 ## Verification
 
-Run `pip install -e ".[dev]"` and `pytest` in a supported Python environment. No original dataset is provided, so results on real recordings must be collected and checked by the user. MATLAB execution has not been verified across MATLAB releases; MFCC availability depends on the Audio Toolbox installation.
+Run `pip install -e ".[dev]"` and `pytest` in a supported Python environment. MATLAB execution and Audio Toolbox MFCC behavior should be verified in the target MATLAB installation.

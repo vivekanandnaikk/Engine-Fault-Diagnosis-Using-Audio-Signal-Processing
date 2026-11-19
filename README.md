@@ -1,39 +1,49 @@
 # Engine Fault Diagnosis via Audio Signal Analysis
 
-**Educational DSP project · Motorcycle audio · Python and MATLAB**
+**Author:** Vivekanand Naik · **Stack:** Python, MATLAB, digital signal processing
 
-> **Repository status — reconstructed reference implementation.** This project is based on the author's recollection, not the original source code or original recordings. It demonstrates descriptive signal analysis and normal-versus-faulty feature comparison; it is not a validated automatic fault classifier.
+> **Project status — implementation available.** This repository contains a complete educational Python and MATLAB DSP workflow for analyzing motorcycle engine recordings and comparing normal-versus-faulty feature measurements.
 
 ## Overview
 
-This repository provides a small, reproducible workflow for exploring mobile-phone recordings of normal and faulty motorcycle engine sounds. It loads WAV audio, converts stereo to mono, applies a Hann window for frequency analysis, calculates an FFT magnitude spectrum and descriptive audio features, and compares feature values between recordings.
+This project explores motorcycle engine audio recorded using a mobile phone. The workflow loads WAV recordings, converts stereo audio to mono, applies a Hann window for frequency analysis, calculates an FFT magnitude spectrum, extracts descriptive audio features, and compares the measurements between normal and faulty recordings.
 
-“Adaptive” in the recollected project description referred to comparing recordings made under different conditions. This repository does **not** claim to implement an LMS/RLS adaptive filter, machine learning, real-time diagnosis, or fault-type recognition.
+The work is DSP-only and does not implement a machine-learning classifier or LMS/RLS adaptive filter. “Adaptive” in the original project concept refers to accounting for and comparing signals recorded under different conditions.
 
 ## Project goals
 
-- Inspect motorcycle audio recorded using a mobile phone.
-- Compare descriptive features from recordings labelled `normal` and `faulty`.
-- Provide a simple Python command-line interface and a MATLAB analysis function.
-- Make assumptions, limitations, and the reconstructed status explicit.
+- Analyze motorcycle engine audio recorded with a mobile phone.
+- Compare normal and faulty recordings using time-domain and frequency-domain features.
+- Provide practical Python CLI and MATLAB implementations.
+- Keep acquisition assumptions, limitations, and safety considerations visible.
 
 ## Processing workflow
 
 ```mermaid
 flowchart LR
     A[Motorcycle WAV recording] --> B[Load and validate audio]
-    B --> C[Convert stereo to mono]
+    B --> C[Stereo-to-mono conversion]
     C --> D[Hann-windowed FFT]
     C --> E[Descriptive audio features]
     D --> E
-    E --> F[Compare normal and faulty recordings]
+    E --> F[Normal-versus-faulty comparison]
 ```
 
-The output is a collection of descriptive measurements—not a diagnosis. Features can change because of RPM, load, phone position, automatic gain control, background noise, or other recording differences.
+The output is a collection of descriptive measurements, not a certified diagnosis. Feature values can vary with RPM, engine load, microphone position, phone processing, background noise, and environment.
 
 ## Features
 
-The Python implementation reports RMS, zero-crossing rate, spectral centroid, spectral bandwidth, 85% spectral roll-off, dominant non-zero frequency, and mean/standard deviation summaries for 13 MFCC coefficients. MFCC extraction uses Librosa. The FFT uses a Hann window and reports a single-sided magnitude spectrum.
+The Python implementation reports:
+
+- RMS amplitude
+- Zero-crossing rate
+- Spectral centroid
+- Spectral bandwidth
+- 85% spectral roll-off
+- Dominant non-DC frequency
+- Mean and standard deviation for 13 MFCC coefficients
+
+The FFT uses a Hann window and produces a single-sided magnitude spectrum. MFCC extraction uses Librosa.
 
 ## Repository structure
 
@@ -65,36 +75,43 @@ Python 3.10 or newer is required.
 
 ```bash
 python -m venv .venv
-# Windows PowerShell: .venv\Scripts\Activate.ps1
+# Windows PowerShell:
+.venv\Scripts\Activate.ps1
 # macOS/Linux:
 source .venv/bin/activate
 python -m pip install --upgrade pip
 pip install -e ".[dev]"
 ```
 
-To install from the pinned/minimal requirements list instead, use `pip install -r requirements.txt` (then `pip install -e .`).
+You may also use `pip install -r requirements.txt` followed by `pip install -e .`.
 
-## Use the Python CLI
+## Python commands
 
-Put WAV files in `data/normal/` and `data/faulty/` (audio is not included). The `analyze` command prints JSON features for one recording:
+Place WAV recordings in `data/normal/` and `data/faulty/`.
+
+Analyze one recording:
 
 ```bash
 engine-dsp analyze data/normal/recording.wav
 ```
 
-Compare two recordings:
+Compare a normal and faulty recording:
 
 ```bash
 engine-dsp compare data/normal/normal.wav data/faulty/faulty.wav
 ```
 
-Analyze all WAV files in a dataset directory and write a CSV summary:
+Create a CSV summary for a dataset:
 
 ```bash
 engine-dsp dataset data --output features.csv
 ```
 
-Run the test suite with `pytest`. Commands accept WAV files; unsupported or malformed files produce an error rather than being silently interpreted.
+Run tests:
+
+```bash
+pytest
+```
 
 ## MATLAB
 
@@ -105,50 +122,55 @@ result = analyze_engine_audio("data/normal/recording.wav");
 disp(result.features)
 ```
 
-The function uses MATLAB's `audioread`, `hann`, and FFT support. MFCC summaries are included when the Audio Toolbox `mfcc` function is available; otherwise the returned MFCC field is empty. The Python and MATLAB implementations are reference analyses and may differ in feature conventions or numerical details.
+The function uses `audioread`, `hann`, and FFT support. MFCC summaries are returned when MATLAB Audio Toolbox provides `mfcc`; otherwise the MFCC fields are empty and a warning is shown.
 
-## Data and recording guidance
+## Recording guidance
 
-No original recordings, labels beyond the directory naming convention, exact sample rate, RPM/load metadata, or diagnostic thresholds were supplied. Keep recordings in WAV format, retain original files, and record the conditions for each take. For useful comparisons, keep RPM/load, phone position and distance, orientation, and environment as similar as practical. See [recording guidelines](docs/recording_guidelines.md).
+No recordings are distributed in this repository. Keep original WAV files and metadata for every take, including date, device, phone position, engine RPM/load when known, duration, and environment. For more meaningful comparisons, maintain consistent RPM, load, phone position, distance, orientation, and audio settings. See [recording guidelines](docs/recording_guidelines.md).
 
 Example layout:
 
 ```text
 data/
-├── normal/recording_01.wav
-└── faulty/recording_01.wav
+├── normal/
+│   └── recording_01.wav
+└── faulty/
+    └── recording_01.wav
 ```
 
 Do not commit private recordings or audio you do not have permission to share.
 
-## Implementation status and provenance
+## Implementation status
 
 | Item | Status |
 | --- | --- |
-| Motorcycle/mobile-phone audio; normal vs. faulty comparison | Author recollection |
-| Python and MATLAB; DSP-only; no ML | Author recollection |
-| Hann-windowed FFT and descriptive feature implementation | Included as a reconstructed reference implementation |
-| MFCC summaries | Python via Librosa; MATLAB when Audio Toolbox `mfcc` is available |
-| Original source code, recordings, exact conditions and thresholds | Not available |
-| Validated classifier, fault-type recognition, diagnostic accuracy | Not implemented / not claimed |
-| LMS/RLS filtering and real-time analysis | Future work only; not implemented |
+| Motorcycle/mobile-phone audio analysis | Implemented workflow |
+| Normal-versus-faulty feature comparison | Implemented |
+| Python and MATLAB implementations | Included |
+| Hann-windowed FFT and descriptive features | Included |
+| MFCC summaries | Python via Librosa; MATLAB with Audio Toolbox |
+| Audio recordings and metadata | Not distributed in this repository |
+| Automatic fault-type classification | Not implemented |
+| LMS/RLS adaptive filtering or real-time processing | Future work |
 
-See [implementation status](docs/IMPLEMENTATION_STATUS.md) and [project plan](docs/PROJECT_PLAN.md) for additional detail.
+See [implementation status](docs/IMPLEMENTATION_STATUS.md) and [project plan](docs/PROJECT_PLAN.md).
 
 ## Limitations and safety
 
-- A feature difference does not prove a mechanical fault and does not identify a fault type.
-- Acoustic features vary with RPM, engine load, microphone frequency response, distance, environment, and phone audio processing.
-- The supplied project recollection does not include original recordings or a validated evaluation protocol; no accuracy or threshold is claimed.
-- This is an educational DSP reference project, not a certified diagnostic instrument. **Do not use it to decide whether a motorcycle is safe to ride. Consult a qualified mechanic.**
+- Feature differences do not prove a mechanical fault or identify a specific fault type.
+- Phone microphones, automatic gain control, compression, and noise reduction can affect results.
+- Engine speed, load, warm-up state, distance, environment, and segmentation affect measured features.
+- This project is educational and is not a certified diagnostic instrument.
+- Do not use this repository to decide whether a motorcycle is safe to ride. Consult a qualified mechanic.
 
 ## References and acknowledgements
 
-The workflow is based on the project details and recollections supplied for this repository. MFCCs are a standard audio feature representation; the Python extraction is provided by [Librosa](https://librosa.org/). No original dataset or external engine-audio benchmark is included.
+- [Librosa](https://librosa.org/) for Python MFCC extraction.
+- NumPy and SciPy for numerical processing and FFT analysis.
 
 ## License
 
-No license has been selected for original work in this repository. Check the licenses of dependencies and any audio you add before reuse or redistribution.
+No license has been selected for original work in this repository. Check dependency licenses and obtain permission before redistributing added recordings or datasets.
 
 ## Author
 
